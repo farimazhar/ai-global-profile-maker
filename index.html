@@ -1,16 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Profile Maker</title>
+<title>AI Profile Photo Maker</title>
 <style>
-body{font-family:Arial;background:#0f172a;color:white;text-align:center;padding:20px}
-.card{max-width:400px;margin:auto;background:#1e293b;padding:20px;border-radius:15px}
-#preview{width:100%;height:380px;border-radius:15px;background-size:cover;background-position:center;position:relative;overflow:hidden;display:flex;align-items:end;justify-content:center;margin-top:15px}
-#userImg{width:180px;height:180px;border-radius:50%;object-fit:cover;border:4px solid white;display:none}
-select,input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;font-size:16px}
-button{background:#3b82f6;color:white;font-weight:bold}
+*{box-sizing:border-box}
+body{font-family:Arial;background:#0f172a;color:white;text-align:center;padding:15px;margin:0}
+.card{max-width:420px;margin:auto;background:#1e293b;padding:18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+#preview{width:100%;height:400px;border-radius:14px;background:#000 url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c') center/cover no-repeat;position:relative;display:flex;align-items:flex-end;justify-content:center;margin-top:14px;overflow:hidden}
+#userImg{width:210px;height:210px;border-radius:50%;object-fit:cover;border:5px solid white;box-shadow:0 8px 25px rgba(0,0,0,0.6);display:none;margin-bottom:30px}
+select,input,button{width:100%;padding:13px;margin-top:12px;border-radius:10px;border:none;font-size:16px}
+input{background:white}
+select{background:white}
+button{background:#3b82f6;color:white;font-weight:bold;cursor:pointer}
+button:hover{background:#2563eb}
+h2{margin:5px 0 10px 0}
 </style>
 </head>
 <body>
@@ -18,24 +23,74 @@ button{background:#3b82f6;color:white;font-weight:bold}
 <h2>AI Profile Photo Maker</h2>
 <input type="file" id="photoInput" accept="image/*">
 <select id="country">
-<option value="https://images.unsplash.com/photo-1512453979798-5ea266f8880c">Dubai</option>
-<option value="https://images.unsplash.com/photo-1497366216548-37526070297c">USA</option>
-<option value="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab">UK</option>
-<option value="https://images.unsplash.com/photo-1524634126442-357e0eac3c14">Canada</option>
+<option value="https://images.unsplash.com/photo-1512453979798-5ea266f8880c">Dubai - Burj Khalifa</option>
+<option value="https://images.unsplash.com/photo-1497366216548-37526070297c">USA - Office</option>
+<option value="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab">UK - London</option>
+<option value="https://images.unsplash.com/photo-1449824913935-59a10b8d2000">Pakistan - Pro Office</option>
 </select>
-<div id="preview"><img id="userImg"></div>
-<button>Download</button>
+<div id="preview"><img id="userImg" crossorigin="anonymous"></div>
+<button id="downloadBtn">📥 Download Photo</button>
+<canvas id="c" style="display:none"></canvas>
 </div>
+
 <script>
-const photoInput=document.getElementById('photoInput');
-const country=document.getElementById('country');
-const preview=document.getElementById('preview');
-const userImg=document.getElementById('userImg');
-preview.style.backgroundImage=`url(${country.value})`;
-country.addEventListener('change',()=>{preview.style.backgroundImage=`url(${country.value})`;});
-photoInput.addEventListener('change',(e)=>{
-userImg.src=URL.createObjectURL(e.target.files[0]);
-userImg.style.display='block';
+const photoInput = document.getElementById('photoInput');
+const country = document.getElementById('country');
+const preview = document.getElementById('preview');
+const userImg = document.getElementById('userImg');
+const canvas = document.getElementById('c');
+
+function setBg(url){ preview.style.backgroundImage = `url('${url}')`; }
+setBg(country.value);
+
+country.addEventListener('change', ()=> setBg(country.value));
+
+photoInput.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  userImg.src = URL.createObjectURL(file);
+  userImg.style.display = 'block';
+});
+
+document.getElementById('downloadBtn').addEventListener('click', async ()=>{
+  if(userImg.style.display === 'none' || !userImg.src){
+    alert('Pehle apni photo select karo!');
+    return;
+  }
+  const W=1080, H=1350;
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // Load background
+  const bgImg = new Image();
+  bgImg.crossOrigin = "anonymous";
+  bgImg.src = country.value;
+
+  bgImg.onload = ()=>{
+    ctx.drawImage(bgImg, 0, 0, W, H);
+    // Draw user as circle
+    const size=460, x=W/2-size/2, y=700;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(W/2, y+size/2, size/2, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(userImg, x, y, size, size);
+    ctx.restore();
+
+    // White border
+    ctx.beginPath();
+    ctx.arc(W/2, y+size/2, size/2+4, 0, Math.PI*2);
+    ctx.strokeStyle='white';
+    ctx.lineWidth=10;
+    ctx.stroke();
+
+    const a=document.createElement('a');
+    a.download=`AI-Profile-${Date.now()}.jpg`;
+    a.href=canvas.toDataURL('image/jpeg',0.95);
+    a.click();
+  };
+  bgImg.onerror=()=> alert('Internet slow hai, dubara try karo');
 });
 </script>
 </body>
