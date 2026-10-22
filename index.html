@@ -1,60 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Global Profile Maker - International Viral Tool</title>
-<meta name="description" content="AI Global Profile Maker - Create professional profile photos for LinkedIn, Instagram, CV. Viral worldwide tool.">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Amiri:wght@700&display=swap" rel="stylesheet">
+<title>AI Profile Maker</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:'Poppins',sans-serif}
-header{background:linear-gradient(90deg,#0ea5e9,#8b5cf6);padding:18px;text-align:center;font-size:24px;font-weight:bold}
-.tools{background:#111;padding:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;border-bottom:1px solid #222}
-.tools input,select,button{padding:12px 16px;border-radius:10px;border:none;font-weight:bold}
-.tools input[type=text]{background:#1e1e1e;color:#fff;border:1px solid #333;width:160px}
-.btn{background:#0ea5e9;color:#fff;cursor:pointer;transition:.2s}
-.btn:hover{transform:scale(1.05)}
-.main{display:flex;justify-content:center;padding:25px}
-canvas{max-width:95%;border-radius:20px;box-shadow:0 0 30px rgba(14,165,233,.3);background:#111}
-.lang{position:fixed;right:10px;top:80px;display:flex;flex-direction:column;gap:8px}
-.lang div{background:#1a1a1a;padding:10px 14px;border-radius:10px;cursor:pointer;border:1px solid #222}
-.lang div:hover{background:#222}
+body{font-family:Arial;background:#0f172a;color:white;text-align:center;padding:20px}
+.card{max-width:400px;margin:auto;background:#1e293b;padding:20px;border-radius:15px}
+#preview{width:100%;height:380px;border-radius:15px;background-size:cover;background-position:center;position:relative;overflow:hidden;display:flex;align-items:end;justify-content:center;margin-top:15px}
+#userImg{width:180px;height:180px;border-radius:50%;object-fit:cover;border:4px solid white;display:none}
+select,input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;font-size:16px}
+button{background:#3b82f6;color:white;font-weight:bold}
 </style>
 </head>
 <body>
-<header>🌍 AI Global Profile Maker - International</header>
-<div class="tools">
-<input type="file" id="pic" accept="image/*" style="background:#1e1e1e;color:#fff;border-radius:10px">
-<input id="txt" type="text" value="Khan" placeholder="Enter Name">
-<select id="style" onchange="draw()"><option>Dubai Luxury</option><option>USA Office</option><option>Islamic Green</option><option>UK Professional</option></select>
-<input id="col" type="color" value="#ffffff" oninput="draw()">
-<button class="btn" onclick="draw()">Generate</button>
-<button class="btn" style="background:#22c55e" onclick="save()">Download HD</button>
-</div>
-<div class="lang">
-<div onclick="setL('Khan','Poppins')">🇺🇸 English</div>
-<div onclick="setL('خان','Amiri')">🇸🇦 Arabic/Urdu</div>
-<div onclick="setL('खान','Poppins')">🇮🇳 Hindi</div>
-<div onclick="setL('Khan Baba','Poppins')">🇹🇷 Turkish</div>
-</div>
-<div class="main">
-<canvas id="c" width="900" height="900"></canvas>
+<div class="card">
+<h2>AI Profile Photo Maker</h2>
+<input type="file" id="photoInput" accept="image/*">
+<select id="country">
+<option value="https://images.unsplash.com/photo-1512453979798-5ea266f8880c">Dubai</option>
+<option value="https://images.unsplash.com/photo-1497366216548-37526070297c">USA</option>
+<option value="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab">UK</option>
+<option value="https://images.unsplash.com/photo-1524634126442-357e0eac3c14">Canada</option>
+</select>
+<div id="preview"><img id="userImg"></div>
+<button>Download</button>
 </div>
 <script>
-const c=document.getElementById('c'), x=c.getContext('2d');
-let img=null;
-document.getElementById('pic').addEventListener('change',e=>{let r=new FileReader(); r.onload=()=>{img=new Image(); img.onload=()=>draw(); img.src=r.result;}; r.readAsDataURL(e.target.files[0]);});
-function draw(){
-x.clearRect(0,0,c.width,c.height);
-if(img){let s=Math.min(c.width/img.width,c.height/img.height)*1.1; let w=img.width*s,h=img.height*s; x.drawImage(img,(c.width-w)/2,(c.height-h)/2-40,w,h);}else{x.fillStyle='#161616'; x.fillRect(0,0,c.width,c.height); x.fillStyle='#666'; x.font='26px Poppins'; x.textAlign='center'; x.fillText('Upload Photo to Start',c.width/2,c.height/2); return;}
-let g=x.createLinearGradient(0,c.height-150,0,c.height); g.addColorStop(0,'transparent'); g.addColorStop(1,'rgba(0,0,0,.9)'); x.fillStyle=g; x.fillRect(0,c.height-150,c.width,150);
-let t=document.getElementById('txt').value||'Khan', col=document.getElementById('col').value;
-x.fillStyle=col; x.font=`700 75px Poppins`; x.textAlign='center'; x.shadowColor='#000'; x.shadowBlur=15; x.fillText(t,c.width/2,c.height-50); x.shadowBlur=0;
-}
-function setL(n,f){document.getElementById('txt').value=n; draw();}
-function save(){let a=document.createElement('a'); a.download='global-profile.png'; a.href=c.toDataURL('image/png',1.0); a.click();}
-window.onload=draw;
+const photoInput=document.getElementById('photoInput');
+const country=document.getElementById('country');
+const preview=document.getElementById('preview');
+const userImg=document.getElementById('userImg');
+preview.style.backgroundImage=`url(${country.value})`;
+country.addEventListener('change',()=>{preview.style.backgroundImage=`url(${country.value})`;});
+photoInput.addEventListener('change',(e)=>{
+userImg.src=URL.createObjectURL(e.target.files[0]);
+userImg.style.display='block';
+});
 </script>
 </body>
 </html>
